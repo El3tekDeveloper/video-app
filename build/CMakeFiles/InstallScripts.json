@@ -1,9 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"/home/el3tek/Projects/C-C++/video-app/build/cmake_install.cmake",
-		"/home/el3tek/Projects/C-C++/video-app/build/thirdparty/glfw/cmake_install.cmake",
-		"/home/el3tek/Projects/C-C++/video-app/build/thirdparty/glfw/src/cmake_install.cmake"
-	],
-	"Parallel" : false
-}

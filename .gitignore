@@ -40,6 +40,8 @@
 # debug information files
 *.dwo
 
+# Build files
+/build/
 
 # FFmpeg binaries
 thirdparty/ffmpeg/lib/*.so
