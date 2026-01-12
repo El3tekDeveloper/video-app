@@ -39,3 +39,8 @@
 
 # debug information files
 *.dwo
+
+
+# FFmpeg binaries
+thirdparty/ffmpeg/lib/*.so
+thirdparty/ffmpeg/lib/*.so.*
