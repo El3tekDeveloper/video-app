@@ -2057,15 +2057,16 @@
     <li><a id="toc-OpenJPEG" href="#OpenJPEG">41.20 OpenJPEG</a></li>
     <li><a id="toc-rav1e" href="#rav1e">41.21 rav1e</a></li>
     <li><a id="toc-SVT_002dAV1" href="#SVT_002dAV1">41.22 SVT-AV1</a></li>
-    <li><a id="toc-TwoLAME" href="#TwoLAME">41.23 TwoLAME</a></li>
-    <li><a id="toc-VapourSynth" href="#VapourSynth">41.24 VapourSynth</a></li>
-    <li><a id="toc-x264" href="#x264">41.25 x264</a></li>
-    <li><a id="toc-x265" href="#x265">41.26 x265</a></li>
-    <li><a id="toc-xavs" href="#xavs">41.27 xavs</a></li>
-    <li><a id="toc-xavs2" href="#xavs2">41.28 xavs2</a></li>
-    <li><a id="toc-eXtra_002dfast-Essential-Video-Encoder-_0028XEVE_0029" href="#eXtra_002dfast-Essential-Video-Encoder-_0028XEVE_0029">41.29 eXtra-fast Essential Video Encoder (XEVE)</a></li>
-    <li><a id="toc-eXtra_002dfast-Essential-Video-Decoder-_0028XEVD_0029" href="#eXtra_002dfast-Essential-Video-Decoder-_0028XEVD_0029">41.30 eXtra-fast Essential Video Decoder (XEVD)</a></li>
-    <li><a id="toc-ZVBI" href="#ZVBI">41.31 ZVBI</a></li>
+    <li><a id="toc-SVT_002dJPEG_002dXS" href="#SVT_002dJPEG_002dXS">41.23 SVT-JPEG-XS</a></li>
+    <li><a id="toc-TwoLAME" href="#TwoLAME">41.24 TwoLAME</a></li>
+    <li><a id="toc-VapourSynth" href="#VapourSynth">41.25 VapourSynth</a></li>
+    <li><a id="toc-x264" href="#x264">41.26 x264</a></li>
+    <li><a id="toc-x265" href="#x265">41.27 x265</a></li>
+    <li><a id="toc-xavs" href="#xavs">41.28 xavs</a></li>
+    <li><a id="toc-xavs2" href="#xavs2">41.29 xavs2</a></li>
+    <li><a id="toc-eXtra_002dfast-Essential-Video-Encoder-_0028XEVE_0029" href="#eXtra_002dfast-Essential-Video-Encoder-_0028XEVE_0029">41.30 eXtra-fast Essential Video Encoder (XEVE)</a></li>
+    <li><a id="toc-eXtra_002dfast-Essential-Video-Decoder-_0028XEVD_0029" href="#eXtra_002dfast-Essential-Video-Decoder-_0028XEVD_0029">41.31 eXtra-fast Essential Video Decoder (XEVD)</a></li>
+    <li><a id="toc-ZVBI" href="#ZVBI">41.32 ZVBI</a></li>
   </ul></li>
   <li><a id="toc-Supported-File-Formats_002c-Codecs-or-Features" href="#Supported-File-Formats_002c-Codecs-or-Features">42 Supported File Formats, Codecs or Features</a>
   <ul class="toc-numbered-mark">
@@ -9196,6 +9197,12 @@ in order to be able to decode the data correctly.
 <dd><p>Set the input video pixel format. Default value is <code class="code">yuv420p</code>.
 </p>
 </dd>
+<dt><samp class="option">stride</samp></dt>
+<dd><p>Set frame line size in bytes, only required if there are extra padding.
+For multiplane formats, <samp class="option">stride</samp> is a list of line size for each
+plane.
+</p>
+</dd>
 <dt><samp class="option">video_size</samp></dt>
 <dd><p>Set the input video size. This value must be specified explicitly.
 </p></dd>
@@ -9207,6 +9214,13 @@ size of <code class="code">320x240</code>, and a frame rate of 10 images per sec
 the command:
 </p><div class="example">
 <pre class="example-preformatted">ffplay -f rawvideo -pixel_format rgb24 -video_size 320x240 -framerate 10 input.raw
+</pre></div>
+
+<p>Read a rawvideo with <code class="command">ffplay</code>, assuming a pixel format of <code class="code">yuv420p</code>,
+a video size of <code class="code">1080x1920</code>, has 8 bytes of padding in each line of Y plane,
+and 4 bytes of padding with UV plane,
+</p><div class="example">
+<pre class="example-preformatted">ffplay -f rawvideo -pixel_format yuv420p -video_size 1080x1920 -stride 1088,544,544 input.raw
 </pre></div>
 
 <a class="anchor" id="rcwtdec"></a><a name="rcwt"></a>
@@ -9792,6 +9806,18 @@ means auto (seekable for normal files, non-seekable for named pipes).
 <p>Many demuxers handle seekable and non-seekable resources differently,
 overriding this might speed up opening certain files at the cost of losing some
 features (e.g. accurate seeking).
+</p>
+</dd>
+<dt><samp class="option">pkt_size</samp></dt>
+<dd><p>Set the maximum packet size used for file I/O. A smaller value may reduce
+memory usage. A higher value may increase throughput especially with networked
+filesystems.
+</p>
+<p>For reading, if explicitly set, it overrides the default internal buffer size
+(32 KB) and limits the maximum amount of data read per operation.
+</p>
+<p>For writing, this sets the size of each write operation. The default is 256 KB
+for regular files, 32 KB otherwise.
 </p></dd>
 </dl>
 
@@ -53421,8 +53447,18 @@ to <samp class="file">./configure</samp>.
 for installing the library. Then pass <code class="code">--enable-libsvtav1</code> to configure to
 enable it.
 </p>
+<a name="SVT_002dJPEG_002dXS"></a>
+<h3 class="section">41.23 SVT-JPEG-XS<span class="pull-right"><a class="anchor hidden-xs" href="#SVT_002dJPEG_002dXS" aria-hidden="true">#</a> <a class="anchor hidden-xs"href="#toc-SVT_002dJPEG_002dXS" aria-hidden="true">TOC</a></span></h3>
+
+<p>FFmpeg can make use of the Scalable Video Technology for JPEG-XS library for JPEG-XS
+decoding and encoding.
+</p>
+<p>Go to <a class="url" href="https://github.com/OpenVisualCloud/SVT-JPEG-XS">https://github.com/OpenVisualCloud/SVT-JPEG-XS</a> and follow the instructions
+for installing the library. Then pass <code class="code">--enable-libsvtjpegxs</code> to configure to
+enable it.
+</p>
 <a name="TwoLAME"></a>
-<h3 class="section">41.23 TwoLAME<span class="pull-right"><a class="anchor hidden-xs" href="#TwoLAME" aria-hidden="true">#</a> <a class="anchor hidden-xs"href="#toc-TwoLAME" aria-hidden="true">TOC</a></span></h3>
+<h3 class="section">41.24 TwoLAME<span class="pull-right"><a class="anchor hidden-xs" href="#TwoLAME" aria-hidden="true">#</a> <a class="anchor hidden-xs"href="#toc-TwoLAME" aria-hidden="true">TOC</a></span></h3>
 
 <p>FFmpeg can make use of the TwoLAME library for MP2 encoding.
 </p>
@@ -53431,7 +53467,7 @@ instructions for installing the library.
 Then pass <code class="code">--enable-libtwolame</code> to configure to enable it.
 </p>
 <a name="VapourSynth"></a>
-<h3 class="section">41.24 VapourSynth<span class="pull-right"><a class="anchor hidden-xs" href="#VapourSynth" aria-hidden="true">#</a> <a class="anchor hidden-xs"href="#toc-VapourSynth" aria-hidden="true">TOC</a></span></h3>
+<h3 class="section">41.25 VapourSynth<span class="pull-right"><a class="anchor hidden-xs" href="#VapourSynth" aria-hidden="true">#</a> <a class="anchor hidden-xs"href="#toc-VapourSynth" aria-hidden="true">TOC</a></span></h3>
 
 <p>FFmpeg can read VapourSynth scripts as input. To enable support, pass
 <code class="code">--enable-vapoursynth</code> to configure. Vapoursynth is detected via
@@ -53443,7 +53479,7 @@ be autodetected so the input format has to be forced. For ff* CLI tools,
 add <code class="code">-f vapoursynth</code> before the input <code class="code">-i yourscript.vpy</code>.
 </p>
 <a name="x264"></a>
-<h3 class="section">41.25 x264<span class="pull-right"><a class="anchor hidden-xs" href="#x264" aria-hidden="true">#</a> <a class="anchor hidden-xs"href="#toc-x264" aria-hidden="true">TOC</a></span></h3>
+<h3 class="section">41.26 x264<span class="pull-right"><a class="anchor hidden-xs" href="#x264" aria-hidden="true">#</a> <a class="anchor hidden-xs"href="#toc-x264" aria-hidden="true">TOC</a></span></h3>
 
 <p>FFmpeg can make use of the x264 library for H.264 encoding.
 </p>
@@ -53457,7 +53493,7 @@ configure to enable it.
 details), you must upgrade FFmpeg&rsquo;s license to GPL in order to use it.
 </p></div>
 <a name="x265"></a>
-<h3 class="section">41.26 x265<span class="pull-right"><a class="anchor hidden-xs" href="#x265" aria-hidden="true">#</a> <a class="anchor hidden-xs"href="#toc-x265" aria-hidden="true">TOC</a></span></h3>
+<h3 class="section">41.27 x265<span class="pull-right"><a class="anchor hidden-xs" href="#x265" aria-hidden="true">#</a> <a class="anchor hidden-xs"href="#toc-x265" aria-hidden="true">TOC</a></span></h3>
 
 <p>FFmpeg can make use of the x265 library for HEVC encoding.
 </p>
@@ -53471,7 +53507,7 @@ to enable it.
 details), you must upgrade FFmpeg&rsquo;s license to GPL in order to use it.
 </p></div>
 <a name="xavs"></a>
-<h3 class="section">41.27 xavs<span class="pull-right"><a class="anchor hidden-xs" href="#xavs" aria-hidden="true">#</a> <a class="anchor hidden-xs"href="#toc-xavs" aria-hidden="true">TOC</a></span></h3>
+<h3 class="section">41.28 xavs<span class="pull-right"><a class="anchor hidden-xs" href="#xavs" aria-hidden="true">#</a> <a class="anchor hidden-xs"href="#toc-xavs" aria-hidden="true">TOC</a></span></h3>
 
 <p>FFmpeg can make use of the xavs library for AVS encoding.
 </p>
@@ -53480,7 +53516,7 @@ installing the library. Then pass <code class="code">--enable-libxavs</code> to 
 enable it.
 </p>
 <a name="xavs2"></a>
-<h3 class="section">41.28 xavs2<span class="pull-right"><a class="anchor hidden-xs" href="#xavs2" aria-hidden="true">#</a> <a class="anchor hidden-xs"href="#toc-xavs2" aria-hidden="true">TOC</a></span></h3>
+<h3 class="section">41.29 xavs2<span class="pull-right"><a class="anchor hidden-xs" href="#xavs2" aria-hidden="true">#</a> <a class="anchor hidden-xs"href="#toc-xavs2" aria-hidden="true">TOC</a></span></h3>
 
 <p>FFmpeg can make use of the xavs2 library for AVS2-P2/IEEE1857.4 video encoding.
 </p>
@@ -53494,7 +53530,7 @@ enable it.
 details), you must upgrade FFmpeg&rsquo;s license to GPL in order to use it.
 </p></div>
 <a name="eXtra_002dfast-Essential-Video-Encoder-_0028XEVE_0029"></a>
-<h3 class="section">41.29 eXtra-fast Essential Video Encoder (XEVE)<span class="pull-right"><a class="anchor hidden-xs" href="#eXtra_002dfast-Essential-Video-Encoder-_0028XEVE_0029" aria-hidden="true">#</a> <a class="anchor hidden-xs"href="#toc-eXtra_002dfast-Essential-Video-Encoder-_0028XEVE_0029" aria-hidden="true">TOC</a></span></h3>
+<h3 class="section">41.30 eXtra-fast Essential Video Encoder (XEVE)<span class="pull-right"><a class="anchor hidden-xs" href="#eXtra_002dfast-Essential-Video-Encoder-_0028XEVE_0029" aria-hidden="true">#</a> <a class="anchor hidden-xs"href="#toc-eXtra_002dfast-Essential-Video-Encoder-_0028XEVE_0029" aria-hidden="true">TOC</a></span></h3>
 
 <p>FFmpeg can make use of the XEVE library for EVC video encoding.
 </p>
@@ -53503,7 +53539,7 @@ installing the XEVE library. Then pass <code class="code">--enable-libxeve</code
 enable it.
 </p>
 <a name="eXtra_002dfast-Essential-Video-Decoder-_0028XEVD_0029"></a>
-<h3 class="section">41.30 eXtra-fast Essential Video Decoder (XEVD)<span class="pull-right"><a class="anchor hidden-xs" href="#eXtra_002dfast-Essential-Video-Decoder-_0028XEVD_0029" aria-hidden="true">#</a> <a class="anchor hidden-xs"href="#toc-eXtra_002dfast-Essential-Video-Decoder-_0028XEVD_0029" aria-hidden="true">TOC</a></span></h3>
+<h3 class="section">41.31 eXtra-fast Essential Video Decoder (XEVD)<span class="pull-right"><a class="anchor hidden-xs" href="#eXtra_002dfast-Essential-Video-Decoder-_0028XEVD_0029" aria-hidden="true">#</a> <a class="anchor hidden-xs"href="#toc-eXtra_002dfast-Essential-Video-Decoder-_0028XEVD_0029" aria-hidden="true">TOC</a></span></h3>
 
 <p>FFmpeg can make use of the XEVD library for EVC video decoding.
 </p>
@@ -53512,7 +53548,7 @@ installing the XEVD library. Then pass <code class="code">--enable-libxevd</code
 enable it.
 </p>
 <a name="ZVBI"></a>
-<h3 class="section">41.31 ZVBI<span class="pull-right"><a class="anchor hidden-xs" href="#ZVBI" aria-hidden="true">#</a> <a class="anchor hidden-xs"href="#toc-ZVBI" aria-hidden="true">TOC</a></span></h3>
+<h3 class="section">41.32 ZVBI<span class="pull-right"><a class="anchor hidden-xs" href="#ZVBI" aria-hidden="true">#</a> <a class="anchor hidden-xs"href="#toc-ZVBI" aria-hidden="true">TOC</a></span></h3>
 
 <p>ZVBI is a VBI decoding library which can be used by FFmpeg to decode DVB
 teletext pages and DVB teletext subtitles.
@@ -53838,6 +53874,7 @@ following image formats are supported:
 <tr><td width="40%">JPEG</td><td width="10%">X</td><td width="10%">X</td><td width="40%">Progressive JPEG is not supported.</td></tr>
 <tr><td width="40%">JPEG 2000</td><td width="10%">X</td><td width="10%">X</td></tr>
 <tr><td width="40%">JPEG-LS</td><td width="10%">X</td><td width="10%">X</td></tr>
+<tr><td width="40%">JPEG-XS</td><td width="10%">E</td><td width="10%">E</td><td width="40%">Supported through external library libsvtjpegxs</td></tr>
 <tr><td width="40%">LJPEG</td><td width="10%">X</td><td width="10%"></td><td width="40%">Lossless JPEG</td></tr>
 <tr><td width="40%">Media 100</td><td width="10%"></td><td width="10%">X</td></tr>
 <tr><td width="40%">MSP</td><td width="10%"></td><td width="10%">X</td><td width="40%">Microsoft Paint image</td></tr>

@@ -2,6 +2,7 @@
 #include <thread>
 #include <chrono>
 
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -17,8 +18,8 @@
 GLFWwindow* window;
 
 const char* TITLE = "Video App";
-int WIDTH = 1024;
-int HEIGHT = 720;
+int WIDTH = 1920;
+int HEIGHT = 1080;
 
 UIRenderer uiRenderer;
 UI ui;

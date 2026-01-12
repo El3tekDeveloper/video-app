@@ -588,29 +588,34 @@ Its argument has the same syntax for colors in FFmpeg:
 where <code class="code">a</code> is a number between <code class="code">0</code> and <code class="code">1</code>.
 </li></ul>
 
-<p>The color can be a variable name. In that case, its value is interpreted
-as a <code class="code">0xRRGGBBAA</code> code.
-</p>
 <div class="example">
-<pre class="example-preformatted">circle 75 100 50
+<pre class="example-preformatted">circle 70 70 60
 setcolor #FF0000
 fill
 
-circle 125 100 50
-setvar CustomGreen 0x90EEAAFF
-setcolor CustomGreen
-fill
-
-circle 175 100 50
+circle 170 170 60
 setcolor blue@0.5
 fill
 </pre></div>
 
-<p>The commands <a class="ref" href="#cmd_005fsetrgba"><code class="code">setrgba</code></a> and <a class="ref" href="#cmd_005fsethsla"><code class="code">sethsla</code></a> allow setting colors
-using expressions.
+<p>The color can be a variable name. In that case, it must be assigned with
+<a class="ref" href="#cmd_005fdefrgba"><code class="code">defrgba</code></a>, <a class="ref" href="#cmd_005fdefhsla"><code class="code">defhsla</code></a>, or <a class="ref" href="#cmd_005fsetvar"><code class="code">setvar</code></a> and a color.
 </p>
-<p><a class="ref" href="#cmd_005fdefrgba"><code class="code">defrgba</code></a> and <a class="ref" href="#cmd_005fdefhsla"><code class="code">defhsla</code></a> compute the color and store it in a
-variable.
+<div class="example">
+<pre class="example-preformatted">circle 70 70 60
+setvar CustomGreen #22FF44
+setcolor CustomGreen
+fill
+
+circle 170 170 60
+defhsla CustomBlue 200 0.7 0.5 1
+setcolor CustomBlue
+fill
+</pre></div>
+
+<p>The commands <a class="ref" href="#cmd_005fsetrgba"><code class="code">setrgba</code></a> and <a class="ref" href="#cmd_005fsethsla"><code class="code">sethsla</code></a> allow setting colors using
+expressions. Similar to <a class="ref" href="#cmd_005fdefrgba"><code class="code">defrgba</code></a> and <a class="ref" href="#cmd_005fdefhsla"><code class="code">defhsla</code></a>, but with no
+intermediate variable.
 </p>
 <a name="Constants"></a>
 <h4 class="subsection">2.4.5 Constants<span class="pull-right"><a class="anchor hidden-xs" href="#Constants" aria-hidden="true">#</a> <a class="anchor hidden-xs"href="#toc-Constants" aria-hidden="true">TOC</a></span></h4>
@@ -1010,14 +1015,14 @@ fill
 <h4 class="subsection">3.3.2 Variables<span class="pull-right"><a class="anchor hidden-xs" href="#Variables-1" aria-hidden="true">#</a> <a class="anchor hidden-xs"href="#toc-Variables-1" aria-hidden="true">TOC</a></span></h4>
 
 <p><a class="ref" href="#cmd_005fsetcolor"><code class="code">setcolor</code></a> and <a class="ref" href="#cmd_005fcolorstop"><code class="code">colorstop</code></a> accept a variable name as the
-argument. When a variable is used, its value is interpreted as a
-<code class="code">0xRRGGBBAA</code> code.
+argument. The variable must be assigned with <a class="ref" href="#cmd_005fdefrgba"><code class="code">defrgba</code></a>,
+<a class="ref" href="#cmd_005fdefhsla"><code class="code">defhsla</code></a>, or <a class="ref" href="#cmd_005fsetvar"><code class="code">setvar</code></a> and a color.
 </p>
 <table class="cartouche" border="1"><tr><th>
 Example</th></tr><tr><td>
 <div class="example">
 <pre class="example-preformatted">// Use color #1020FF, alpha = 50%
-setvar someblue 0x1020FF7F
+setvar someblue #1020FF@0.5
 
 setcolor someblue
 
@@ -1040,16 +1045,16 @@ Example</th></tr><tr><td>
 rect 30 30 120 120
 fill
 
-setvar teal 0x70AAAAFF  // Now, `teal` is #70AAAA
-setcolor teal
+setvar teal #70AAAA
+setcolor teal         // Use the new color for `teal`.
 rect 90 90 120 120
 fill
 </pre></div>
 
 </td></tr></table>
 
-<p><a class="ref" href="#cmd_005fdefrgba"><code class="code">defrgba</code></a> and <a class="ref" href="#cmd_005fdefhsla"><code class="code">defhsla</code></a> compute the <code class="code">0xRRGGBBAA</code> value
-for a color given its color components:
+<p><a class="ref" href="#cmd_005fdefrgba"><code class="code">defrgba</code></a> and <a class="ref" href="#cmd_005fdefhsla"><code class="code">defhsla</code></a> assign a color to a variable, by providing
+an expression for each color component:
 </p>
 <ul class="itemize mark-bullet">
 <li>For <a class="ref" href="#cmd_005fdefrgba"><code class="code">defrgba</code></a>: <em class="emph">red</em>, <em class="emph">green</em>, <em class="emph">blue</em>, and
@@ -1421,9 +1426,9 @@ proc zigzag color y {
     stroke
 }
 
-call zigzag 0x40C0FFFF 60
-call zigzag 0x00AABBFF 120
-call zigzag 0x20F0B7FF 180
+call zigzag #40C0FF 60
+call zigzag #00AABB 120
+call zigzag #20F0B7 180
 </pre></div>
 
 </td></tr></table>
@@ -1515,10 +1520,29 @@ call example    // executes block2
 <a name="Function-p"></a>
 <h4 class="subsection">3.9.1 Function <code class="code">p</code><span class="pull-right"><a class="anchor hidden-xs" href="#Function-p" aria-hidden="true">#</a> <a class="anchor hidden-xs"href="#toc-Function-p" aria-hidden="true">TOC</a></span></h4>
 
-<p><code class="code">p(x, y)</code> returns the color of the pixel at coordinates
-<code class="code">x, y</code>, as a <code class="code">0xRRGGBBAA</code> value. This value can be assigned to
-a variable, which can be used later as the argument for <a class="ref" href="#cmd_005fsetcolor"><code class="code">setcolor</code></a>.
+<p><code class="code">p(x, y)</code> returns the color of the pixel at coordinates <code class="code">x, y</code>, as a
+<code class="code">0xRRGGBBAA</code> value. It can be assigned to a variable, so the color can be
+available for <a class="ref" href="#cmd_005fsetcolor"><code class="code">setcolor</code></a> and <a class="ref" href="#cmd_005fcolorstop"><code class="code">colorstop</code></a> commands.
 </p>
+<p>If a single expression contains multiple calls to the function, it must return
+the value of the last call in order to use it as a color.
+</p>
+<table class="cartouche" border="1"><tr><th>
+Example</th></tr><tr><td>
+<p>In this example, the first call to <code class="code">p(0, 0)</code> is stored in the variable
+<var class="var">0</var> of the expression. Then, the same expression makes a second call to
+<code class="code">p(1, 1)</code>, and finally it returns the value in the variable <var class="var">0</var>.
+</p>
+<div class="example">
+<pre class="example-preformatted">setvar pixel (st(0, p(0, 0)); p(1, 1); ld(0))
+</pre></div>
+
+<p>Since the result of the expression is not the last call to <code class="code">p</code>, the
+variable <var class="var">pixel</var> can not be used as a color, but it still can be used as
+a numeric <code class="code">0xRRGGBBAA</code> value.
+</p>
+</td></tr></table>
+
 <p>If the coordinates are outside the frame, or any of the arguments is not
 a finite number (like
 <a class="uref" href="https://en.wikipedia.org/wiki/NaN"><code class="code">NaN</code></a>), the function
@@ -2130,8 +2154,8 @@ stroke
 <p><b class="b"><code class="code">defhsla varname <var class="var">h</var> <var class="var">s</var> <var class="var">l</var> <var class="var">a</var></code></b>
 </p>
 <p>Similar to <a class="ref" href="#cmd_005fsethsla"><code class="code">sethsla</code></a>, but instead of establishing the color for
-stroke and fill operations, the computed color is stored as a
-<code class="code">0xRRGGBBAA</code> value in the variable <var class="var">varname</var>.
+stroke and fill operations, the computed color is assigned to the
+variable <var class="var">varname</var>.
 </p>
 <p><var class="var">varname</var> can then be used as a color for <a class="ref" href="#cmd_005fsetcolor"><code class="code">setcolor</code></a> and
 <a class="ref" href="#cmd_005fcolorstop"><code class="code">colorstop</code></a>.
@@ -2144,8 +2168,7 @@ stroke and fill operations, the computed color is stored as a
 <p><b class="b"><code class="code">defrgba varname <var class="var">r</var> <var class="var">g</var> <var class="var">b</var> <var class="var">a</var></code></b>
 </p>
 <p>Computes a color from the <em class="emph">red</em>, <em class="emph">green</em>, <em class="emph">blue</em>, and
-<em class="emph">alpha</em> components, and assigns it to the variable <var class="var">varname</var>
-as a <code class="code">0xRRGGBBAA</code> value.
+<em class="emph">alpha</em> components, and assigns it to the variable <var class="var">varname</var>.
 </p>
 <p>All components are values between <code class="code">0</code> and <code class="code">1</code>. Values outside
 that range are clamped to it.

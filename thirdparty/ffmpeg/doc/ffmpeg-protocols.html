@@ -484,6 +484,18 @@ means auto (seekable for normal files, non-seekable for named pipes).
 <p>Many demuxers handle seekable and non-seekable resources differently,
 overriding this might speed up opening certain files at the cost of losing some
 features (e.g. accurate seeking).
+</p>
+</dd>
+<dt><samp class="option">pkt_size</samp></dt>
+<dd><p>Set the maximum packet size used for file I/O. A smaller value may reduce
+memory usage. A higher value may increase throughput especially with networked
+filesystems.
+</p>
+<p>For reading, if explicitly set, it overrides the default internal buffer size
+(32 KB) and limits the maximum amount of data read per operation.
+</p>
+<p>For writing, this sets the size of each write operation. The default is 256 KB
+for regular files, 32 KB otherwise.
 </p></dd>
 </dl>
 

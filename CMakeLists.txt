@@ -2,10 +2,9 @@ cmake_minimum_required(VERSION 3.20)
 project(video-app C CXX)
 set(CMAKE_CXX_STANDARD 17)
 
-add_definitions(-DGLFW_INCLUDE_NONE)
 add_definitions(-DGL_SILENCE_DEPRECATION)
 
-# FFmpeg setup
+# FFmpeg setup for Linux
 set(FFMPEG_DIR ${CMAKE_SOURCE_DIR}/thirdparty/ffmpeg)
 add_library(FFmpeg INTERFACE)
 
@@ -25,21 +24,12 @@ target_link_libraries(FFmpeg INTERFACE
     swresample
 )
 
-# GLFW setup (pre-built)
+# GLFW setup - building from source
 set(GLFW_DIR ${CMAKE_SOURCE_DIR}/thirdparty/glfw)
-add_library(GLFW INTERFACE)
-
-target_include_directories(GLFW INTERFACE
-    ${GLFW_DIR}/include
-)
-
-target_link_directories(GLFW INTERFACE
-    ${GLFW_DIR}/lib
-)
-
-target_link_libraries(GLFW INTERFACE
-    glfw3dll
-)
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+add_subdirectory(${GLFW_DIR})
 
 # GLAD setup
 add_library(glad STATIC thirdparty/glad/src/glad.c)
@@ -56,7 +46,7 @@ target_include_directories(GLM INTERFACE
 # FreeType setup
 set(FREETYPE_DIR ${CMAKE_SOURCE_DIR}/thirdparty/freetype)
 
-# Core FreeType sources - now including gzip, lzw, and svg modules
+# Core FreeType sources
 set(FREETYPE_SOURCES
     "${FREETYPE_DIR}/src/autofit/autofit.c"
     "${FREETYPE_DIR}/src/base/ftbase.c"
@@ -132,29 +122,16 @@ set(SOURCES
 
 add_executable(video-app ${SOURCES})
 
+# Find required Linux packages
+find_package(Threads REQUIRED)
+
 target_link_libraries(video-app PRIVATE 
     glad
     FFmpeg 
-    GLFW
+    glfw
     GLM
     freetype
-    opengl32 
-    gdi32
+    GL
+    ${CMAKE_DL_LIBS}
+    Threads::Threads
 )
-
-# Copy DLLs to output directory
-if (WIN32)
-    file(GLOB FFMPEG_DLLS "${FFMPEG_DIR}/bin/*.dll")
-    
-    add_custom_command(TARGET video-app POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            ${FFMPEG_DLLS}
-            $<TARGET_FILE_DIR:video-app>
-    )
-
-    add_custom_command(TARGET video-app POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            ${GLFW_DIR}/bin/glfw3.dll
-            $<TARGET_FILE_DIR:video-app>
-    )
-endif()

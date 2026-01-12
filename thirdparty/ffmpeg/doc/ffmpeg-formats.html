@@ -1836,6 +1836,12 @@ in order to be able to decode the data correctly.
 <dd><p>Set the input video pixel format. Default value is <code class="code">yuv420p</code>.
 </p>
 </dd>
+<dt><samp class="option">stride</samp></dt>
+<dd><p>Set frame line size in bytes, only required if there are extra padding.
+For multiplane formats, <samp class="option">stride</samp> is a list of line size for each
+plane.
+</p>
+</dd>
 <dt><samp class="option">video_size</samp></dt>
 <dd><p>Set the input video size. This value must be specified explicitly.
 </p></dd>
@@ -1847,6 +1853,13 @@ size of <code class="code">320x240</code>, and a frame rate of 10 images per sec
 the command:
 </p><div class="example">
 <pre class="example-preformatted">ffplay -f rawvideo -pixel_format rgb24 -video_size 320x240 -framerate 10 input.raw
+</pre></div>
+
+<p>Read a rawvideo with <code class="command">ffplay</code>, assuming a pixel format of <code class="code">yuv420p</code>,
+a video size of <code class="code">1080x1920</code>, has 8 bytes of padding in each line of Y plane,
+and 4 bytes of padding with UV plane,
+</p><div class="example">
+<pre class="example-preformatted">ffplay -f rawvideo -pixel_format yuv420p -video_size 1080x1920 -stride 1088,544,544 input.raw
 </pre></div>
 
 <a class="anchor" id="rcwtdec"></a><a name="rcwt"></a>
