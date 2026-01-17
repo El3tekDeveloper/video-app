@@ -6,7 +6,7 @@
 class VideoRenderer
 {
 private:
-    GLuint VAO, VBO, EBO;
+	GLuint VAO, VBO, EBO;
     GLuint shaderProgram;
     GLuint videoTexture;
 

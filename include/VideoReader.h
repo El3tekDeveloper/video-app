@@ -11,12 +11,13 @@ extern "C"
 #include <libswscale/swscale.h>
 #include <libavutil/avutil.h>
 #include <libavutil/imgutils.h>
+#include <libavutil/error.h>
 }
 
 class VideoReader
 {
 public:
-    VideoReader();
+	VideoReader();
     ~VideoReader();
 
     bool Open(const char* filename);
@@ -26,6 +27,9 @@ public:
 
     int GetWidth() const { return width; }
     int GetHeight() const { return height; }
+
+    long long totelFrames = -1;
+
     AVRational GetTimeBase() const { return timeBase; }
     double GetDuration() const;
 
@@ -40,7 +44,7 @@ private:
 
     int width = 0;
     int height = 0;
-    
+
     double duration = 0.0;
     AVRational timeBase;
 };

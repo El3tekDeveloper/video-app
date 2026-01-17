@@ -17,12 +17,18 @@ target_link_directories(FFmpeg INTERFACE
 )
 
 target_link_libraries(FFmpeg INTERFACE
-    avcodec
     avformat
-    avutil
-    swscale
+    avcodec
     swresample
+    swscale
+    avutil
 )
+
+if(UNIX AND NOT APPLE)
+    target_link_libraries(FFmpeg INTERFACE
+        m pthread dl
+    )
+endif()
 
 # GLFW setup - building from source
 set(GLFW_DIR ${CMAKE_SOURCE_DIR}/thirdparty/glfw)
@@ -101,8 +107,18 @@ target_compile_definitions(freetype PRIVATE
     FT2_BUILD_LIBRARY
 )
 
-# Link zlib for gzip compression support
 target_link_libraries(freetype PRIVATE z)
+
+# miniaudio (header-only)
+add_library(miniaudio INTERFACE)
+
+target_include_directories(miniaudio INTERFACE
+    ${CMAKE_SOURCE_DIR}/thirdparty/miniaudio
+)
+
+if(UNIX AND NOT APPLE)
+    target_link_libraries(miniaudio INTERFACE dl m pthread)
+endif()
 
 include_directories(
     ${PROJECT_SOURCE_DIR}
@@ -115,14 +131,15 @@ include_directories(
 set(SOURCES
     src/main.cpp
     src/VideoReader.cpp
+    src/AudioReader.cpp
     src/VideoRenderer.cpp
+    src/miniaudio_impl.cpp
     gui/UI.cpp
     gui/UIRenderer.cpp
 )
 
 add_executable(video-app ${SOURCES})
 
-# Find required Linux packages
 find_package(Threads REQUIRED)
 
 target_link_libraries(video-app PRIVATE 
@@ -131,7 +148,23 @@ target_link_libraries(video-app PRIVATE
     glfw
     GLM
     freetype
+    miniaudio
     GL
     ${CMAKE_DL_LIBS}
     Threads::Threads
 )
+
+# Copy Assets
+set(SOURCE_DIR "${CMAKE_SOURCE_DIR}/assets")
+
+set(DEST_DIR "${CMAKE_BINARY_DIR}/assets")
+
+add_custom_command(
+    OUTPUT "${DEST_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E remove_directory "${DEST_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${SOURCE_DIR}" "${DEST_DIR}"
+    COMMENT "Copying assets folder to build directory"
+    VERBATIM
+)
+
+add_custom_target(copy_assets ALL DEPENDS "${DEST_DIR}")
