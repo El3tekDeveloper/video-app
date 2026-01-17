@@ -42,6 +42,7 @@
 
 # Build files
 /build/
+/.cache/
 
 # FFmpeg binaries
 thirdparty/ffmpeg/lib/*.so
